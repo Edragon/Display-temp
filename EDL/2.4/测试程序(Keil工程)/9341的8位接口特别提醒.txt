@@ -1,0 +1,33 @@
+此说明仅仅针对8位驱动做个提醒，对于16位驱动的亲们可以完全忽略此说明
+
+9341的8位接口跟传统的IC8位接口在写入数据的时候有一点区别
+传统的IC在8位接口下写寄存器，寄存器数据，颜色数据，都是通用以下这个总线写入函数：
+void LCD_Writ_Bus(unsigned int da)   //写入总线
+{
+   LCD_DataPortH=da>>8;//写入高8位数据
+   LCD_WR=0;
+   LCD_WR=1; 
+   LCD_DataPortH=da; //写入低8位数据
+   LCD_WR=0;
+   LCD_WR=1; 
+}
+从这个函数可以看出，不管写入的数据是8位数据还是16位数据，都是当成16位数据来写的
+
+
+而9341的8位接口下，寄存器，寄存器数据，这两个8位数据的写入不能当成16位数据来写入总线，否则无法驱动，也就是说这两个数据的写入需要单独增加一个函数来只写入一次8位数据到总线，而颜色数据还是依然使用上面的函数：
+函数如下：
+void LCD_Writ_COLORBus(char VH,char VL)   //颜色数据写入总线
+{
+   LCD_DataPortH=VH;	
+   LCD_WR=0;
+   LCD_WR=1; 
+   LCD_DataPortH=VL;	
+   LCD_WR=0;
+   LCD_WR=1; 
+}
+void LCD_Writ_COMBus(char da)   //寄存器和寄存器数据写入总线
+{
+   LCD_DataPortH=da;	
+   LCD_WR=0;
+   LCD_WR=1; 
+}
