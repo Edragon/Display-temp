@@ -1,0 +1,105 @@
+C51 COMPILER V9.01   LCD                                                                   02/22/2014 15:41:00 PAGE 1   
+
+
+C51 COMPILER V9.01, COMPILATION OF MODULE LCD
+OBJECT MODULE PLACED IN LCD.obj
+COMPILER INVOKED BY: C:\Keil\C51\BIN\C51.EXE LCD\LCD.c LARGE BROWSE DEBUG OBJECTEXTEND PRINT(.\LCD.lst) OBJECT(LCD.obj)
+
+line level    source
+
+   1          #include <reg51.h>
+   2          #include <intrins.h>
+   3          #include <sys\sys.h>
+   4          #include <lcd\lcd.h>
+   5          u16 BACK_COLOR, POINT_COLOR;   //背景色，画笔色      
+   6          
+   7          void LCD_Writ_Bus(char VH,char VL)   //并行数据写入函数
+   8          {
+   9   1          LCD_DataPortH=VH;   
+  10   1              LCD_DataPortL=VL;               
+  11   1              LCD_WR=0;
+  12   1              LCD_WR=1; 
+  13   1      }       
+  14          void LCD_WR_DATA8(char VH,char VL) //发送数据-8位参数
+  15          {
+  16   1          LCD_RS=1;
+  17   1              LCD_Writ_Bus(VH,VL);
+  18   1      }  
+  19           void LCD_WR_DATA(int da)
+  20          {
+  21   1          LCD_RS=1;
+  22   1              LCD_Writ_Bus(da>>8,da);
+  23   1      }         
+  24          void LCD_WR_REG(int da)  
+  25          {       
+  26   1          LCD_RS=0;
+  27   1              LCD_Writ_Bus(da>>8,da);
+  28   1      }
+  29          //设置起始地址与结束地址
+  30          void Address_set(unsigned int x1,unsigned int y1,unsigned int x2,unsigned int y2)
+  31          { 
+  32   1              LCD_WR_REG(0x02);//开始y
+  33   1              LCD_WR_DATA(y1); 
+  34   1              LCD_WR_REG(0x03);//开始x
+  35   1              LCD_WR_DATA(x1);            
+  36   1              LCD_WR_REG(0x06);//结束y
+  37   1              LCD_WR_DATA(y2); 
+  38   1              LCD_WR_REG(0x07);//结束x
+  39   1              LCD_WR_DATA(x2);   
+  40   1              LCD_WR_REG(0x0f);                                                                                        
+  41   1      }
+  42          void Lcd_Init(void)
+  43          {
+  44   1      
+  45   1              LCD_RD=1;
+  46   1              LCD_WR=1;
+  47   1              LCD_REST=0;
+  48   1              delayms(20);    //此处保证要有5ms以上才能保证复位稳定,推荐20ms
+  49   1              LCD_REST=1;     
+  50   1              delayms(20);    //此处保证要有5ms以上才能保证复位稳定,推荐20ms          
+  51   1              LCD_CS =0;  //打开片选使能
+  52   1      
+  53   1              LCD_WR_REG(0x01); //打开背光    
+  54   1              LCD_WR_DATA(16); 
+  55   1      
+C51 COMPILER V9.01   LCD                                                                   02/22/2014 15:41:00 PAGE 2   
+
+  56   1      
+  57   1      }
+  58          //清屏函数
+  59          //Color:要清屏的填充色
+  60          void LCD_Clear(u16 Color)
+  61          {
+  62   1              u8 VH,VL;
+  63   1              u16 i,j;
+  64   1              VH=Color>>8;
+  65   1              VL=Color;       
+  66   1              Address_set(0,0,LCD_W-1,LCD_H-1);
+  67   1          for(i=0;i<LCD_W;i++)
+  68   1               {
+  69   2                for (j=0;j<LCD_H;j++)
+  70   2                      {
+  71   3                       LCD_WR_DATA8(VH,VL);
+  72   3                  }
+  73   2      
+  74   2                }
+  75   1      }
+  76          
+  77          
+  78          
+  79          
+  80          
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    249    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =      4      11
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
