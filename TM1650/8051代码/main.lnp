@@ -1,0 +1,6 @@
+"STARTUP.obj",
+"DS3231.obj",
+"main.obj",
+"tm1650.obj" 
+TO "main" 
+RAMSIZE(256) 

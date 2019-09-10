@@ -1,0 +1,207 @@
+C51 COMPILER V9.01   MAIN                                                                  11/16/2015 16:15:28 PAGE 1   
+
+
+C51 COMPILER V9.01, COMPILATION OF MODULE MAIN
+OBJECT MODULE PLACED IN main.OBJ
+COMPILER INVOKED BY: C:\Keil\C51\BIN\C51.EXE main.c BROWSE DEBUG OBJECTEXTEND
+
+line level    source
+
+   1          #include <15f104.h>
+   2          #include<intrins.h>
+   3          #include"ds3231.h"
+   4          #include"tm1650.h"
+   5          
+   6          #define uchar unsigned char
+   7          #define uint  unsigned int
+   8          
+   9          uchar i, mode,flash;
+  10          uchar left,right; //显示缓冲
+  11          uchar CODE[] = {0xFc,0x84,0xBA,0xAE,0xC6,0x6E,0x7E,0xA4,0xFe,0xEe,0x00};//0-9,灭
+  12          bit sec;//1HZ秒点闪烁
+  13          
+  14          void display()
+  15          {
+  16   1              if(left/16)TM1650_Set(0x68, CODE[left/16]);else TM1650_Set(0x68, CODE[10]);
+  17   1              TM1650_Set(0x6A, CODE[left%16]);
+  18   1      
+  19   1          TM1650_Set(0x6c, CODE[right/16]);
+  20   1              TM1650_Set(0x6E, CODE[right%16]|sec);
+  21   1      }
+  22          
+  23          void Timer_init()                //定时器，用于调整时间时数码管的闪烁
+  24          {
+  25   1              TMOD=0X01;
+  26   1              TH0=(65536-50000)/256;
+  27   1              TL0=(65536-50000)%256;
+  28   1              TR0=0;
+  29   1              ET0=1;
+  30   1              INT_CLKO=0x10;//开启外部中断2，下降沿触发
+  31   1              EA=1;
+  32   1      }
+  33          
+  34          void normal()
+  35          {
+  36   1              left = read_ds3231(2);
+  37   1              right = read_ds3231(1);
+  38   1              if((left>=0x21)||(left<7))
+  39   1              TM1650_Set(0x48,0x21);//夜间降低显示亮度
+  40   1              else
+  41   1              TM1650_Set(0x48,0x61);//日间提高显示亮度
+  42   1      }
+  43          void DS3232_init()
+  44          {
+  45   1              if(read_ds3231(7)!=0x22)
+  46   1              {
+  47   2              
+  48   2              write_ds3231(0x00,0x00);  //second
+  49   2              write_ds3231(0x01,0x11); //minute
+  50   2              write_ds3231(0x02,0x20); //hour
+  51   2              write_ds3231(0x06,0x15);//year
+  52   2              write_ds3231(0x05,0x11);//month
+  53   2              write_ds3231(0x04,0x13);//date
+  54   2              write_ds3231(0x07,0x22);// 用闹钟寄存器判断是否掉电
+  55   2              }
+C51 COMPILER V9.01   MAIN                                                                  11/16/2015 16:15:28 PAGE 2   
+
+  56   1      }
+  57          void main()
+  58          {
+  59   1              uchar temp;
+  60   1              Timer_init();
+  61   1              TM1650_Set(0x48,0x61);//初始化为6级灰度，开显示
+  62   1              DS3232_init();   // DS3231掉电时初始化一下
+  63   1              write_ds3231(0x0e,0x00);  //设置INT位为1HZ方波输出
+  64   1              while(1)
+  65   1              {
+  66   2                          if(Scan_Key()==0x47)
+  67   2                              {
+  68   3                                  mode++;
+  69   3                                      if(mode>3)
+  70   3                                      {
+  71   4                                              mode=0;
+  72   4                                              normal();
+  73   4                                      }
+  74   3                                      while(Scan_Key()==0x47);
+  75   3                              } 
+  76   2              
+  77   2              switch (mode)
+  78   2              {
+  79   3                      case 0:                                  //正常显示状态，12：34
+  80   3                      {
+  81   4                              if(INT_CLKO!=0x10)
+  82   4                              INT_CLKO=0x10;
+  83   4                              break;
+  84   4                      }
+  85   3                      case 1:                                 //小时调整界面 12：
+  86   3                      {
+  87   4                              INT_CLKO=0x00;
+  88   4                              sec=1;
+  89   4                              TR0=1;
+  90   4                              right = read_ds3231(1);
+  91   4                              
+  92   4                              if(flash) left = read_ds3231(2);
+  93   4                              else      left = 0xaa;
+  94   4                              
+  95   4                              display();
+  96   4                                       
+  97   4                              if(Scan_Key()==0x77)
+  98   4                              {
+  99   5                                      temp=read_ds3231(2);
+ 100   5                                      temp=((temp>>4)*10)+(temp&0x0f);
+ 101   5                                      temp++;
+ 102   5                                      if(temp>=24)temp=0;
+ 103   5                                      temp = ((temp/10)<<4)|(temp%10);
+ 104   5                                      write_ds3231(0x02,temp);
+ 105   5                                      left=read_ds3231(2);
+ 106   5                                      display();
+ 107   5                                      while(Scan_Key()==0x77);
+ 108   5                                      
+ 109   5                              }
+ 110   4                              break;
+ 111   4                      }
+ 112   3      
+ 113   3                      case 2: //minute adjust
+ 114   3                      {
+ 115   4                              INT_CLKO=0x00;
+ 116   4                              sec=1;
+ 117   4                              TR0=1;
+C51 COMPILER V9.01   MAIN                                                                  11/16/2015 16:15:28 PAGE 3   
+
+ 118   4                              left = read_ds3231(2);
+ 119   4                              if(flash) right = read_ds3231(1);
+ 120   4                              else      right = 0xaa;
+ 121   4                              display();       
+ 122   4                              if(Scan_Key()==0x77)
+ 123   4                              {
+ 124   5                                      temp=read_ds3231(1);
+ 125   5                                      temp=((temp>>4)*10)+(temp&0x0f);
+ 126   5                                      temp++;
+ 127   5                                      if(temp>=60)temp=0;
+ 128   5                                      temp = ((temp/10)<<4)|(temp%10);
+ 129   5                                      write_ds3231(0x01,temp);
+ 130   5                                      right=read_ds3231(1);
+ 131   5                                      display();
+ 132   5                                      while(Scan_Key()==0x77);
+ 133   5                              }
+ 134   4                              break;
+ 135   4                      }
+ 136   3                      
+ 137   3                      case 3:                                          //秒显示与归零状态  :55
+ 138   3                      {
+ 139   4                              INT_CLKO=0x00;
+ 140   4                              sec=1;
+ 141   4                              TR0=0;
+ 142   4                              left= 0xaa;
+ 143   4                              right = read_ds3231(0);
+ 144   4                              display();
+ 145   4                              if(Scan_Key()==0x77)
+ 146   4                              {
+ 147   5                                      write_ds3231(0x00,0x00);
+ 148   5                                      right = read_ds3231(0);
+ 149   5                                      display();
+ 150   5                                      while(Scan_Key()==0x77);
+ 151   5                              }
+ 152   4                              break;
+ 153   4                      }
+ 154   3                      
+ 155   3              
+ 156   3              } 
+ 157   2              }       
+ 158   1              
+ 159   1                      
+ 160   1      }
+ 161          void timer0() interrupt 1
+ 162          {
+ 163   1              uchar flag;
+ 164   1              TH0=(65536-50000)/256;
+ 165   1              TL0=(65536-50000)%256;
+ 166   1              flag++;
+ 167   1              if(flag==5)
+ 168   1              {
+ 169   2                      flag=0;
+ 170   2                      flash=!flash;
+ 171   2              }
+ 172   1      }
+ 173          void int2() interrupt 10   //DS3231输出1HZ方波，每个下降沿更新时间，冒号闪烁
+ 174          {
+ 175   1              sec=!sec;
+ 176   1              normal();
+ 177   1              display();
+ 178   1      }       
+
+C51 COMPILER V9.01   MAIN                                                                  11/16/2015 16:15:28 PAGE 4   
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    692    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =     16       2
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =      1    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
