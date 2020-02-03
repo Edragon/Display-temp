@@ -1,3 +1,0 @@
-".\Out Hex\Lcd.obj" 
-TO ".\Out Hex\spi" 
-PRINT(".\Out Hex\spi.m51") RAMSIZE(256) 

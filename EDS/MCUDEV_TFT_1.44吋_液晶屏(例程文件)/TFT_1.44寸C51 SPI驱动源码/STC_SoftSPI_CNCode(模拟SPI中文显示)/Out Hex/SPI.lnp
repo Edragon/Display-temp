@@ -1,3 +1,0 @@
-".\Out Hex\282838p.obj" 
-TO ".\Out Hex\SPI" 
-NOPRINT RAMSIZE(256) 
