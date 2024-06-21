@@ -1,0 +1,293 @@
+C51 COMPILER V9.52.0.0   TEST                                                              04/17/2016 11:52:59 PAGE 1   
+
+
+C51 COMPILER V9.52.0.0, COMPILATION OF MODULE TEST
+OBJECT MODULE PLACED IN .\obj\test.obj
+COMPILER INVOKED BY: C:\Keil_c51\C51\BIN\C51.EXE USER\test.c LARGE BROWSE INCDIR(.\font;.\LCD;.\sys;.\touch;.\GUI;.\USER
+                    -) DEBUG OBJECTEXTEND PRINT(.\test.lst) TABS(2) OBJECT(.\obj\test.obj)
+
+line level    source
+
+   1          #include "lcd.h"
+   2          #include "string.h"
+   3          #include "sys.h"
+   4          #include "gui.h"
+   5          #include "test.h"
+   6          #include "touch.h"
+   7          #include "pic.h"
+   8          //////////////////////////////////////////////////////////////////////////////////   
+   9          //本程序只供学习使用，未经作者许可，不得用于其它任何用途
+  10          //测试硬件：单片机STC51,晶振30M  单片机工作电压3.3V
+  11          //QDtech-TFT液晶驱动 for C51
+  12          //中景园电子
+  13          //淘宝网站:https://shop73023976.taobao.com/?spm=2013.1.1000126.d21.o6byVe
+  14          //我司提供技术支持，任何技术问题欢迎随时交流学习
+  15          //手机:15989313508（冯工） 
+  16          
+  17          //创建日期:2016-04-17
+  18          //版本：V1.1
+  19          //版权所有，盗版必究。
+  20          //Copyright(C) 中景园电子2009-2019
+  21          //All rights reserved
+  22          //********************************************************************************
+  23          
+  24          //========================variable==========================//
+  25          u16 ColorTab[5]={BRED,YELLOW,RED,GREEN,BLUE};//定义颜色数组
+  26          //=====================end of variable======================//
+  27          
+  28          //******************************************************************
+  29          //函数名：  DrawTestPage
+  30          //作者：    中景园电子
+  31          //日期：    2013-02-22
+  32          //功能：    绘制测试界面
+  33          //输入参数：str :字符串指针
+  34          //返回值：  无
+  35          //修改记录：
+  36          //******************************************************************
+  37          void DrawTestPage(u8 *str)
+  38          {
+  39   1      //绘制固定栏up
+  40   1      LCD_Fill(0,0,lcddev.width,20,BLUE);
+  41   1      //绘制固定栏down
+  42   1      LCD_Fill(0,lcddev.height-20,lcddev.width,lcddev.height,BLUE);
+  43   1      POINT_COLOR=WHITE;
+  44   1      Gui_StrCenter(0,2,WHITE,BLUE,str,16,1);//居中显示
+  45   1      Gui_StrCenter(0,lcddev.height-18,WHITE,BLUE,"中景园版权所有",16,1);//居中显示
+  46   1      //绘制测试区域
+  47   1      LCD_Fill(0,20,lcddev.width,lcddev.height-20,BLACK);
+  48   1      }
+  49          
+  50          //******************************************************************
+  51          //函数名：  main_test
+  52          //作者：    中景园电子
+  53          //日期：    2013-02-22
+  54          //功能：    绘制全动电子综合测试程序主界面
+C51 COMPILER V9.52.0.0   TEST                                                              04/17/2016 11:52:59 PAGE 2   
+
+  55          //输入参数：无
+  56          //返回值：  无
+  57          //修改记录：
+  58          //******************************************************************
+  59          void main_test(void)
+  60          {
+  61   1        DrawTestPage("中景园电子综合测试程序");
+  62   1        
+  63   1        Gui_StrCenter(0,30,RED,BLUE,"中景园",16,1);//居中显示
+  64   1        Gui_StrCenter(0,60,RED,BLUE,"中景园综合测试程序",16,1);//居中显示 
+  65   1        Gui_StrCenter(0,90,YELLOW,BLUE,"3.5' ILI9486 320X480",16,1);//居中显示
+  66   1        Gui_StrCenter(0,120,BLUE,BLUE,"ZJY 2016-4-17",16,1);//居中显示
+  67   1        delay_ms(1500);   
+  68   1        delay_ms(1500);
+  69   1      }
+  70          
+  71          //******************************************************************
+  72          //函数名：  Test_Color
+  73          //作者：    中景园电子
+  74          //日期：    2013-02-22
+  75          //功能：    颜色填充测试，依次填充白色、黑色、红色、绿色、蓝色
+  76          //输入参数：无
+  77          //返回值：  无
+  78          //修改记录：
+  79          //******************************************************************
+  80          void Test_Color(void)
+  81          {
+  82   1        DrawTestPage("测试1:纯色填充测试");
+  83   1        LCD_Fill(0,20,lcddev.width,lcddev.height-20,WHITE);
+  84   1        Show_Str(lcddev.width-50,30,BLUE,YELLOW,"White",16,1);delay_ms(500);
+  85   1        LCD_Fill(0,20,lcddev.width,lcddev.height-20,BLACK);
+  86   1        Show_Str(lcddev.width-50,30,BLUE,YELLOW,"Black",16,1);delay_ms(500);
+  87   1        LCD_Fill(0,20,lcddev.width,lcddev.height-20,RED);
+  88   1        Show_Str(lcddev.width-50,30,BLUE,YELLOW,"Red",16,1); delay_ms(500);
+  89   1        LCD_Fill(0,20,lcddev.width,lcddev.height-20,GREEN);
+  90   1        Show_Str(lcddev.width-50,30,BLUE,YELLOW,"Green",16,1);delay_ms(500);
+  91   1        LCD_Fill(0,20,lcddev.width,lcddev.height-20,BLUE);
+  92   1        Show_Str(lcddev.width-50,30,WHITE,YELLOW,"Blue",16,1);delay_ms(500);
+  93   1      
+  94   1      }
+  95          
+  96          //******************************************************************
+  97          //函数名：  Test_FillRec
+  98          //作者：    中景园电子
+  99          //日期：    2013-02-22
+ 100          //功能：    矩形框显示和填充测试，依次显示粉红色、黄色、红色、绿色、蓝色矩形框，
+ 101          //        延时1500毫秒后，依次按照粉红色、黄色、红色、绿色、蓝色填充矩形框 
+ 102          //输入参数：无
+ 103          //返回值：  无
+ 104          //修改记录：
+ 105          //******************************************************************
+ 106          void Test_FillRec(void)
+ 107          {
+ 108   1        u8 i=0;
+ 109   1        DrawTestPage("测试2:GUI矩形填充测试");
+ 110   1        LCD_Fill(0,20,lcddev.width,lcddev.height-20,WHITE);
+ 111   1        for (i=0; i<5; i++) 
+ 112   1        {
+ 113   2          LCD_DrawRectangle(lcddev.width/2-80+(i*15),lcddev.height/2-80+(i*15),lcddev.width/2-80+(i*15)+60,lcddev.
+             -height/2-80+(i*15)+60); 
+ 114   2          POINT_COLOR=ColorTab[i];
+ 115   2        }
+C51 COMPILER V9.52.0.0   TEST                                                              04/17/2016 11:52:59 PAGE 3   
+
+ 116   1        delay_ms(1500); 
+ 117   1        LCD_Fill(0,20,lcddev.width,lcddev.height-20,WHITE); 
+ 118   1        for (i=0; i<5; i++) 
+ 119   1        {
+ 120   2          LCD_DrawFillRectangle(lcddev.width/2-80+(i*15),lcddev.height/2-80+(i*15),lcddev.width/2-80+(i*15)+60,lcd
+             -dev.height/2-80+(i*15)+60); 
+ 121   2          POINT_COLOR=ColorTab[i];
+ 122   2        }
+ 123   1        delay_ms(1500);
+ 124   1      }
+ 125          
+ 126          //******************************************************************
+ 127          //函数名：  Test_FillRec
+ 128          //作者：    中景园电子
+ 129          //日期：    2013-02-22
+ 130          //功能：    圆形框显示和填充测试，依次显示粉红色、黄色、红色、绿色、蓝色圆形框，
+ 131          //        延时1500毫秒后，依次按照粉红色、黄色、红色、绿色、蓝色填充圆形框 
+ 132          //输入参数：无
+ 133          //返回值：  无
+ 134          //修改记录：
+ 135          //******************************************************************
+ 136          void Test_Circle(void)
+ 137          {
+ 138   1        u8 i=0;
+ 139   1        DrawTestPage("测试3:GUI画圆填充测试");
+ 140   1        LCD_Fill(0,20,lcddev.width,lcddev.height-20,WHITE);
+ 141   1        for (i=0; i<5; i++)  
+ 142   1          gui_circle(lcddev.width/2-80+(i*25),lcddev.height/2-50+(i*25),ColorTab[i],30,0);
+ 143   1        delay_ms(1500); 
+ 144   1        LCD_Fill(0,20,lcddev.width,lcddev.height-20,WHITE); 
+ 145   1        for (i=0; i<5; i++) 
+ 146   1            gui_circle(lcddev.width/2-80+(i*25),lcddev.height/2-50+(i*25),ColorTab[i],30,1);
+ 147   1        delay_ms(1500);
+ 148   1      }
+ 149          
+ 150          //******************************************************************
+ 151          //函数名：  English_Font_test
+ 152          //作者：    中景园电子
+ 153          //日期：    2013-02-22
+ 154          //功能：    英文显示测试 
+ 155          //输入参数：无
+ 156          //返回值：  无
+ 157          //修改记录：
+ 158          //******************************************************************
+ 159          void English_Font_test(void)
+ 160          {
+ 161   1        DrawTestPage("测试4:英文显示测试");
+ 162   1        POINT_COLOR=RED;
+ 163   1        BACK_COLOR=BLUE;
+ 164   1        LCD_ShowString(10,30,12,"6X12:abcdefghijklmnopqrstuvwxyz",0);
+ 165   1        LCD_ShowString(10,45,12,"6X12:ABCDEFGHIJKLMNOP0123456789",1);
+ 166   1        LCD_ShowString(10,60,12,"6X12:~!@#$%^&*()_+{}:<>?/|-+.",0);
+ 167   1        LCD_ShowString(10,80,16,"8X16:abcdefghijklmnopqrstuvw",0);
+ 168   1        LCD_ShowString(10,100,16,"8X16:ABCDEFGHIJKLMN01234567",1);
+ 169   1        LCD_ShowString(10,120,16,"8X16:~!@#$%^&*()_+{}:<>?/|",0); 
+ 170   1        delay_ms(1200);
+ 171   1      }
+ 172          
+ 173          //******************************************************************
+ 174          //函数名：  Chinese_Font_test
+ 175          //作者：    中景园电子
+ 176          //日期：    2013-02-22
+C51 COMPILER V9.52.0.0   TEST                                                              04/17/2016 11:52:59 PAGE 4   
+
+ 177          //功能：    中文显示测试
+ 178          //输入参数：无
+ 179          //返回值：  无
+ 180          //修改记录：
+ 181          //******************************************************************
+ 182          void Chinese_Font_test(void)
+ 183          { 
+ 184   1        DrawTestPage("测试5:中文显示测试");
+ 185   1        Show_Str(10,30,BLUE,YELLOW,"16X16:中景园电子技术有限公司欢迎您",16,0);
+ 186   1        Show_Str(10,50,BLUE,YELLOW,"16X16:Welcome中景园电子",16,1);
+ 187   1        Show_Str(10,70,BLUE,YELLOW,"24X24:中景园中文测试",24,1);
+ 188   1        Show_Str(10,100,BLUE,YELLOW,"32X32:字体测试",32,1);
+ 189   1        delay_ms(1200);
+ 190   1      }
+ 191          
+ 192          //******************************************************************
+ 193          //函数名：  Pic_test
+ 194          //作者：    中景园电子
+ 195          //日期：    2013-02-22
+ 196          //功能：    图片显示测试，依次显示三幅40X40 QQ图像
+ 197          //输入参数：无
+ 198          //返回值：  无
+ 199          //修改记录：
+ 200          //******************************************************************
+ 201          void Pic_test(void)
+ 202          {
+ 203   1        DrawTestPage("测试6:图片显示测试");
+ 204   1        LCD_Fill(0,20,lcddev.width,lcddev.height-20,WHITE);
+ 205   1        Gui_Drawbmp16(30,30,gImage_qq);
+ 206   1        Show_Str(30+12,75,BLUE,YELLOW,"QQ",16,1);
+ 207   1        Gui_Drawbmp16(90,30,gImage_qq);
+ 208   1        Show_Str(90+12,75,BLUE,YELLOW,"QQ",16,1);
+ 209   1        Gui_Drawbmp16(150,30,gImage_qq);
+ 210   1        Show_Str(150+12,75,BLUE,YELLOW,"QQ",16,1);
+ 211   1        delay_ms(1200);
+ 212   1      }
+ 213          
+ 214          //******************************************************************
+ 215          //函数名：  Touch_Test
+ 216          //作者：    中景园电子
+ 217          //日期：    2013-02-22
+ 218          //功能：    触摸手写测试
+ 219          //输入参数：无
+ 220          //返回值：  无
+ 221          //修改记录：
+ 222          //******************************************************************
+ 223          void Touch_Test(void)
+ 224          { 
+ 225   1        u8 i=0;
+ 226   1        u16 j=0;
+ 227   1        u16 colorTemp=0;    
+ 228   1        DrawTestPage("测试7:Touch测试");
+ 229   1        LCD_ShowString(lcddev.width-24,0,16,"RST",1);//显示清屏区域
+ 230   1        LCD_Fill(lcddev.width-52,2,lcddev.width-50+20,18,RED); 
+ 231   1        POINT_COLOR=RED;
+ 232   1        while(1)
+ 233   1        {    
+ 234   2          if(Convert_Pos())     //触摸屏被按下
+ 235   2          { 
+ 236   3            if(tp_pixlcd.x<lcddev.width&&tp_pixlcd.y<lcddev.height)
+ 237   3            { 
+ 238   4              if(tp_pixlcd.x>(lcddev.width-24)&&tp_pixlcd.y<16)
+C51 COMPILER V9.52.0.0   TEST                                                              04/17/2016 11:52:59 PAGE 5   
+
+ 239   4              {
+ 240   5                DrawTestPage("测试7:Touch测试");//清除
+ 241   5                POINT_COLOR=colorTemp;
+ 242   5                LCD_ShowString(lcddev.width-24,0,16,"RST",1);//显示清屏区域
+ 243   5                LCD_Fill(lcddev.width-52,2,lcddev.width-50+20,18,POINT_COLOR); 
+ 244   5              }
+ 245   4              else if((lcddev.width-tp_pixlcd.x>(lcddev.width-60)&&(lcddev.width-tp_pixlcd.x)<(lcddev.width-50+20))&
+             -&tp_pixlcd.y<20)
+ 246   4              {
+ 247   5              LCD_Fill(lcddev.width-52,2,lcddev.width-50+20,18,ColorTab[j%5]); 
+ 248   5              POINT_COLOR=ColorTab[(j++)%5];
+ 249   5              colorTemp=POINT_COLOR;
+ 250   5              delay_ms(10);
+ 251   5              }
+ 252   4      
+ 253   4              else 
+ 254   4              TP_Draw_Big_Point(lcddev.width-tp_pixlcd.x,tp_pixlcd.y,POINT_COLOR);             
+ 255   4            }
+ 256   3          }else delay_ms(10); //没有按键按下的时候              
+ 257   2        }   
+ 258   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =   3058    ----
+   CONSTANT SIZE    =   3742    ----
+   XDATA SIZE       =     10      10
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

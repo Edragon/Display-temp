@@ -1,0 +1,128 @@
+C51 COMPILER V9.01   DS3231                                                                11/16/2015 16:15:27 PAGE 1   
+
+
+C51 COMPILER V9.01, COMPILATION OF MODULE DS3231
+OBJECT MODULE PLACED IN DS3231.OBJ
+COMPILER INVOKED BY: C:\Keil\C51\BIN\C51.EXE DS3231.c BROWSE DEBUG OBJECTEXTEND
+
+line level    source
+
+   1          #include <15f104.h>
+   2          #include<intrins.h>
+   3          #include"ds3231.h"
+   4          
+   5          void delay()//微秒级延时
+   6          { ;; }
+   7          
+   8          void start()//开始信号
+   9          {
+  10   1              sda=1;
+  11   1              delay();
+  12   1              scl=1;
+  13   1              delay();
+  14   1              sda=0;
+  15   1              delay();        
+  16   1      }
+  17          
+  18          void stop()//停止信号
+  19          {
+  20   1              sda=0;
+  21   1              delay();
+  22   1              scl=1;
+  23   1              delay();
+  24   1              sda=1;
+  25   1              delay();
+  26   1      }
+  27          
+  28          bit respons()  //应答
+  29          {
+  30   1              uchar i;
+  31   1              i=0;
+  32   1              scl=1;
+  33   1              delay();
+  34   1              while((sda==1)&&(i<250))i++;
+  35   1              scl=0;
+  36   1              delay();
+  37   1              return(1);
+  38   1      }
+  39          void write_i2c(uchar dat)//向IIC设备写入1BYTE的数据
+  40          {
+  41   1              uchar i,temp;
+  42   1              temp=dat;
+  43   1              for(i=0;i<8;i++)
+  44   1              {
+  45   2                      temp=temp<<1;
+  46   2                      scl=0;
+  47   2                  delay();
+  48   2                      sda=CY;
+  49   2                      delay();
+  50   2                      scl=1;
+  51   2                      delay();
+  52   2              }
+  53   1              scl=0;
+  54   1              delay();
+  55   1              sda=1;
+C51 COMPILER V9.01   DS3231                                                                11/16/2015 16:15:27 PAGE 2   
+
+  56   1              delay();
+  57   1      }
+  58          
+  59          uchar read_i2c()
+  60          {
+  61   1              uchar i,k;
+  62   1              scl=0;
+  63   1              delay();
+  64   1              sda=1;
+  65   1              delay();
+  66   1              for(i=0;i<8;i++)
+  67   1              {
+  68   2                      scl=1;
+  69   2                      delay();
+  70   2                      k=(k<<1)|sda;
+  71   2                      scl=0;
+  72   2                      delay();
+  73   2              }
+  74   1              return k;
+  75   1              
+  76   1      }
+  77          void write_ds3231(uchar address,uchar dat)      //向DS3231的某个地址写入1byte数据
+  78          {
+  79   1              start();
+  80   1              write_i2c(0xd0);
+  81   1              while(!respons());
+  82   1              write_i2c(address);
+  83   1              while(!respons());
+  84   1              write_i2c(dat);
+  85   1              while(!respons());
+  86   1              stop();
+  87   1      }
+  88          
+  89          uchar read_ds3231(uchar address)         //从DS3231的某个地址读取1byte数据
+  90          {
+  91   1              uchar dat;
+  92   1              start();
+  93   1              write_i2c(0xd0);
+  94   1              while(!respons());
+  95   1              write_i2c(address);
+  96   1              while(!respons()); 
+  97   1              start();
+  98   1              write_i2c(0xd1);
+  99   1              while(!respons());
+ 100   1              dat=read_i2c();
+ 101   1              stop();
+ 102   1              return dat;
+ 103   1      } 
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    202    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
